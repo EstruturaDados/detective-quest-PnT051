@@ -1,0 +1,238 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Estrutura que representa uma sala da mansão
+typedef struct Sala {
+    char nome[50];
+    struct Sala *esquerda;
+    struct Sala *direita;
+} Sala;
+
+
+// Função para criar uma nova sala
+Sala* criarSala(const char *nome) {
+    Sala *novaSala = (Sala*) malloc(sizeof(Sala));
+
+    if (novaSala == NULL) {
+        printf("Erro: nao foi possivel criar a sala.\n");
+        exit(1);
+    }
+
+    strcpy(novaSala->nome, nome);
+    novaSala->esquerda = NULL;
+    novaSala->direita = NULL;
+
+    return novaSala;
+}
+
+
+// Função responsável pela exploração da mansão
+void explorarSalas(Sala *salaAtual) {
+
+    char opcao;
+
+    while (salaAtual != NULL) {
+
+        printf("\n========================================\n");
+        printf("        DETECTIVE QUEST - MANSÃO\n");
+        printf("========================================\n");
+
+        printf("Sala atual: %s\n", salaAtual->nome);
+
+
+        // Verifica se a sala é uma folha da árvore
+        if (salaAtual->esquerda == NULL &&
+            salaAtual->direita == NULL) {
+
+            printf("\nVoce chegou ao fim deste caminho!\n");
+            printf("Sala final: %s\n", salaAtual->nome);
+
+            break;
+        }
+
+
+        printf("\nEscolha seu caminho:\n");
+
+        if (salaAtual->esquerda != NULL) {
+            printf("e - Ir para a esquerda: %s\n",
+                   salaAtual->esquerda->nome);
+        }
+
+        if (salaAtual->direita != NULL) {
+            printf("d - Ir para a direita: %s\n",
+                   salaAtual->direita->nome);
+        }
+
+        printf("s - Sair da exploracao\n");
+
+        printf("\nDigite sua opcao: ");
+        scanf(" %c", &opcao);
+
+
+        // Caminho da esquerda
+        if (opcao == 'e' || opcao == 'E') {
+
+            if (salaAtual->esquerda != NULL) {
+                salaAtual = salaAtual->esquerda;
+            }
+            else {
+                printf("\nNao existe uma sala a esquerda.\n");
+            }
+        }
+
+
+        // Caminho da direita
+        else if (opcao == 'd' || opcao == 'D') {
+
+            if (salaAtual->direita != NULL) {
+                salaAtual = salaAtual->direita;
+            }
+            else {
+                printf("\nNao existe uma sala a direita.\n");
+            }
+        }
+
+
+        // Sair do jogo
+        else if (opcao == 's' || opcao == 'S') {
+
+            printf("\nExploracao encerrada.\n");
+            printf("Obrigado por jogar Detective Quest!\n");
+
+            break;
+        }
+
+
+        // Opção inválida
+        else {
+
+            printf("\nOpcao invalida!\n");
+            printf("Digite e para esquerda, d para direita ou s para sair.\n");
+        }
+    }
+}
+
+
+// Libera a memória utilizada pela árvore
+void liberarArvore(Sala *raiz) {
+
+    if (raiz == NULL) {
+        return;
+    }
+
+    liberarArvore(raiz->esquerda);
+    liberarArvore(raiz->direita);
+
+    free(raiz);
+}
+
+
+int main() {
+
+    /*
+     * ==========================================================
+     * DETECTIVE QUEST
+     * Nivel Novato - Mapa da Mansao com Arvore Binaria
+     * ==========================================================
+     *
+     * Cada sala representa um no da arvore.
+     * O Hall de Entrada e a raiz da arvore.
+     *
+     * O jogador pode:
+     * e -> ir para a esquerda
+     * d -> ir para a direita
+     * s -> sair da exploracao
+     */
+
+
+    // ==========================================================
+    // CRIACAO DO HALL DE ENTRADA
+    // ==========================================================
+
+    Sala *hall = criarSala("Hall de Entrada");
+
+
+    // ==========================================================
+    // PRIMEIRO NIVEL DA MANSÃO
+    // ==========================================================
+
+    hall->esquerda = criarSala("Biblioteca");
+    hall->direita = criarSala("Sala de Estar");
+
+
+    // ==========================================================
+    // SEGUNDO NIVEL DA MANSÃO
+    // ==========================================================
+
+    hall->esquerda->esquerda =
+        criarSala("Escritorio");
+
+    hall->esquerda->direita =
+        criarSala("Sala de Leitura");
+
+
+    hall->direita->esquerda =
+        criarSala("Sala de Jantar");
+
+    hall->direita->direita =
+        criarSala("Cozinha");
+
+
+    // ==========================================================
+    // TERCEIRO NIVEL - FIM DE ALGUNS CAMINHOS
+    // ==========================================================
+
+    hall->esquerda->esquerda->esquerda =
+        criarSala("Cofre Secreto");
+
+    hall->esquerda->esquerda->direita =
+        criarSala("Quarto de Hospedes");
+
+
+    hall->direita->direita->esquerda =
+        criarSala("Despensa");
+
+    hall->direita->direita->direita =
+        criarSala("Adega");
+
+
+    // ==========================================================
+    // INICIO DO JOGO
+    // ==========================================================
+
+    printf("\n");
+    printf("**********************************************\n");
+    printf("*                                            *\n");
+    printf("*          DETECTIVE QUEST                   *\n");
+    printf("*          NIVEL NOVATO                      *\n");
+    printf("*                                            *\n");
+    printf("**********************************************\n");
+
+    printf("\nBem-vindo a mansao!\n");
+    printf("Sua investigacao comeca no Hall de Entrada.\n");
+
+    printf("\nComandos:\n");
+    printf("e - explorar o caminho da esquerda\n");
+    printf("d - explorar o caminho da direita\n");
+    printf("s - sair da exploracao\n");
+
+
+    // Inicia a exploração da mansão
+    explorarSalas(hall);
+
+
+    // ==========================================================
+    // FINALIZACAO
+    // ==========================================================
+
+    // Libera toda a memória da árvore
+    liberarArvore(hall);
+
+    printf("\n========================================\n");
+    printf("Memoria da arvore liberada com sucesso.\n");
+    printf("Detective Quest encerrado!\n");
+    printf("========================================\n");
+
+    return 0;
+}
